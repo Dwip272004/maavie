@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>maavie — Where Life Begins</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { serif: ['Cormorant Garamond','serif'], sans: ['Inter','sans-serif'] } } }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: #FAF0D8; }
+        ::-webkit-scrollbar-thumb { background: #8C5238; border-radius: 2px; }
+
+        /* Grain */
+        #grain { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:9999; opacity:0.032; }
+
+        /* Marquee */
+        @keyframes marquee { from { transform:translateX(0) } to { transform:translateX(-50%) } }
+        .marquee-track { animation: marquee 30s linear infinite; }
+
+        /* Reveal animations */
+        .reveal     { opacity:0; transform:translateY(26px); transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
+        .reveal.up  { opacity:1; transform:translateY(0); }
+        .reveal-l   { opacity:0; transform:translateX(-34px); transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
+        .reveal-l.up{ opacity:1; transform:translateX(0); }
+        .reveal-r   { opacity:0; transform:translateX(34px);  transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
+        .reveal-r.up{ opacity:1; transform:translateX(0); }
+
+        /* Image zoom */
+        .zoom-wrap { overflow:hidden; }
+        .zoom-wrap img { transition: transform 1.1s cubic-bezier(.22,1,.36,1); }
+        .zoom-wrap:hover img { transform: scale(1.05); }
+
+        /* Parallax hero */
+        #hero-media { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; will-change:transform; }
+
+        /* Line pulse */
+        @keyframes linePulse { 0%,100%{opacity:.4;} 50%{opacity:1;} }
+        .pulse { animation: linePulse 2.2s ease-in-out infinite; }
+
+        /* Hover underline */
+        .link-u { position:relative; }
+        .link-u::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:1px; background:#8C5238; transition:width .35s ease; }
+        .link-u:hover::after { width:100%; }
+
+        /* Card lift */
+        .card-lift { transition: transform .45s cubic-bezier(.22,1,.36,1), box-shadow .45s ease; }
+        .card-lift:hover { transform:translateY(-7px); box-shadow:0 24px 60px rgba(140,82,56,.13); }
+
+        /* Select arrow */
+        .sel {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238C5238'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+        }
+
+        input:focus, textarea:focus, select:focus { outline:none; }
+
+        /* Ingredient card img */
+        .ing-img { width:100%; height:240px; object-fit:cover; object-position:center; transition: transform 1s cubic-bezier(.22,1,.36,1); }
+        .ing-card:hover .ing-img { transform:scale(1.04); }
+
+        /* Clip shapes */
+        .clip-b { clip-path: polygon(0 0,100% 0,100% 94%,0 100%); }
+        .clip-t { clip-path: polygon(0 6%,100% 0,100% 100%,0 100%); }
+
+        /* Count font */
+        .num { font-feature-settings:'tnum'; }
+    </style>
+</head>
+<body class="bg-[#FAF0D8] text-[#1C1407] font-sans antialiased selection:bg-[#8C5238] selection:text-[#FAF0D8]">
+
+<!-- Grain -->
+<svg id="grain" xmlns="http://www.w3.org/2000/svg">
+    <filter id="gf"><feTurbulence type="fractalNoise" baseFrequency="0.70" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <rect width="100%" height="100%" filter="url(#gf)"/>
+</svg>
+
+
+<!-- ══════════════════════════════════════════
+     NAV
+══════════════════════════════════════════ -->
+<header id="nav" class="sticky top-0 z-50 transition-all duration-300 bg-[#FAF0D8]/92 backdrop-blur-lg border-b border-[#8C5238]/12 py-3 px-6 md:px-12 flex justify-between items-center">
+    <a href="#">
+        <img src="Maavie Logos %26 Backgrounds/logo metallic maavie.png"
+             alt="maavie" class="h-10 md:h-12 w-auto object-contain">
+    </a>
+    <nav class="hidden md:flex space-x-10 text-[10px] uppercase tracking-[0.24em] font-medium text-[#1C1407]">
+        <a href="#story"       class="hover:text-[#8C5238] transition-colors duration-300">Story</a>
+        <a href="#ingredients" class="hover:text-[#8C5238] transition-colors duration-300">Science</a>
+        <a href="#why"         class="hover:text-[#8C5238] transition-colors duration-300">Why Maavie</a>
+        <a href="#promise"     class="hover:text-[#8C5238] transition-colors duration-300">Promise</a>
+    </nav>
+    <a href="#waitlist" class="bg-[#8C5238] text-[#FAF0D8] text-[10px] uppercase tracking-[0.24em] px-6 py-3 font-medium hover:bg-[#70402B] transition-colors duration-300">
+        Join Waitlist
+    </a>
+</header>
+
+
+<!-- ══════════════════════════════════════════
+     HERO — Video + product split
+══════════════════════════════════════════ -->
+<section class="relative min-h-screen flex items-center overflow-hidden clip-b">
+
+    <!-- Background video / fallback -->
+    <video id="hero-media" autoplay muted loop playsinline
+           poster="Maavie Logos %26 Backgrounds/maavie circle bg2.jpg">
+        <source src="Maavie Website/Website%20Assets/Hailuo_Video_Slowly%20zoom%20in%20with%20lights%20blu_476446062708326404.mp4" type="video/mp4">
+    </video>
+
+    <!-- Warm overlay so content is readable -->
+    <div class="absolute inset-0 bg-gradient-to-r from-[#1A0F06]/85 via-[#1A0F06]/60 to-[#1A0F06]/30 pointer-events-none"></div>
+
+    <!-- Content grid -->
+    <div class="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+        <!-- Left: Text -->
+        <div>
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-px bg-[#C4962A]/70"></div>
+                <span class="text-[9px] uppercase tracking-[0.42em] text-[#FAF0D8]/60 font-light">Est. 2026 · India</span>
+            </div>
+
+            <h1 class="font-serif font-light text-[#FAF0D8] leading-[0.93] tracking-tight mb-8"
+                style="font-size:clamp(3.2rem,7vw,6.5rem)">
+                Skincare for<br>
+                <em class="not-italic italic" style="color:#C4962A;">the sacred</em><br>
+                chapter.
+            </h1>
+
+            <p class="text-[13px] md:text-sm text-[#FAF0D8]/65 font-light leading-relaxed max-w-sm mb-10">
+                India's first maternity skin science brand — rooted in Hanbang &amp; Ayurvedic medicine, validated by modern clinical evidence, built for the Indian mother.
+            </p>
+
+            <div class="flex flex-wrap gap-4">
+                <a href="#story"    class="border border-[#FAF0D8]/35 text-[#FAF0D8] px-8 py-[13px] text-[10px] uppercase tracking-[0.24em] font-medium hover:bg-[#FAF0D8] hover:text-[#1C1407] transition-all duration-400">
+                    Our Story
+                </a>
+                <a href="#waitlist" class="bg-[#8C5238] text-[#FAF0D8] px-8 py-[13px] text-[10px] uppercase tracking-[0.24em] font-medium hover:bg-[#C4962A] transition-colors duration-300">
+                    Join Waitlist
+                </a>
+            </div>
+        </div>
+
+        <!-- Right: Product bottle -->
+        <div class="hidden lg:flex justify-center items-end">
+            <img src="Maavie Website/Website%20Assets/Images/ChatGPT%20Image%20Mar%201%2C%202026%2C%2006_05_09%20PM.png"
+                 alt="Maavie Hanbang Hair Genesis Serum"
+                 class="w-full max-w-sm object-contain drop-shadow-2xl"
+                 style="filter: drop-shadow(0 30px 60px rgba(196,150,42,0.25))">
+        </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none">
+        <span class="text-[9px] uppercase tracking-[0.38em] text-[#FAF0D8]/35 font-light">Scroll</span>
+        <div class="w-px h-9 pulse" style="background:linear-gradient(to bottom,#C4962A,transparent)"></div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     MARQUEE
+══════════════════════════════════════════ -->
+<div class="overflow-hidden bg-[#1A0F06] py-[13px] select-none">
+    <div class="flex whitespace-nowrap marquee-track">
+        <span class="text-[#FAF0D8]/75 text-[10px] uppercase tracking-[0.3em] font-medium shrink-0">
+            Tremella Mushroom &nbsp;◦&nbsp; Pear Extract &nbsp;◦&nbsp; Korean Ginseng &nbsp;◦&nbsp; Camellia Oil &nbsp;◦&nbsp; Hanbang Science &nbsp;◦&nbsp; Ayurvedic Wisdom &nbsp;◦&nbsp; 100% Maternity Safe &nbsp;◦&nbsp; India-First &nbsp;◦&nbsp; Dual-Validated &nbsp;◦&nbsp; Zero Retinoids &nbsp;◦&nbsp; Paraben Free &nbsp;◦&nbsp; Phthalate Free &nbsp;◦&nbsp; No Chemical Sunscreen &nbsp;◦&nbsp;&nbsp;&nbsp;&nbsp;
+        </span>
+        <span class="text-[#FAF0D8]/75 text-[10px] uppercase tracking-[0.3em] font-medium shrink-0">
+            Tremella Mushroom &nbsp;◦&nbsp; Pear Extract &nbsp;◦&nbsp; Korean Ginseng &nbsp;◦&nbsp; Camellia Oil &nbsp;◦&nbsp; Hanbang Science &nbsp;◦&nbsp; Ayurvedic Wisdom &nbsp;◦&nbsp; 100% Maternity Safe &nbsp;◦&nbsp; India-First &nbsp;◦&nbsp; Dual-Validated &nbsp;◦&nbsp; Zero Retinoids &nbsp;◦&nbsp; Paraben Free &nbsp;◦&nbsp; Phthalate Free &nbsp;◦&nbsp; No Chemical Sunscreen &nbsp;◦&nbsp;&nbsp;&nbsp;&nbsp;
+        </span>
+    </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     STORY — editorial split
+══════════════════════════════════════════ -->
+<section id="story" class="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh] scroll-mt-20">
+
+    <!-- Image panel -->
+    <div class="zoom-wrap relative min-h-[60vw] lg:min-h-full order-2 lg:order-1 bg-[#2C1A0A]">
+        <img src="Maavie Website/Website%20Assets/Images/ChatGPT%20Image%20Feb%207%2C%202026%2C%2007_33_26%20PM.png"
+             class="reveal-l absolute inset-0 w-full h-full object-cover"
+             style="transition-delay:.1s; object-position:center top;"
+             alt="Indian skin with golden oil">
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent to-[#FAF0D8]/6 pointer-events-none"></div>
+        <div class="absolute bottom-7 left-7">
+            <span class="text-[9px] uppercase tracking-[0.34em] text-white/40 font-light">Ancient wisdom, living skin</span>
+        </div>
+    </div>
+
+    <!-- Text panel -->
+    <div class="bg-[#FAF0D8] flex flex-col justify-center px-8 md:px-14 lg:px-16 py-16 lg:py-24 order-1 lg:order-2 reveal-r">
+        <span class="text-[10px] uppercase tracking-[0.34em] text-[#8C5238] font-semibold block mb-6">Our Story</span>
+        <h2 class="font-serif font-light tracking-tight leading-tight mb-8"
+            style="font-size:clamp(2rem,4vw,3.25rem)">
+            The gap no one<br>
+            <span class="italic text-[#8C5238]">was talking about.</span>
+        </h2>
+
+        <div class="border-l-2 border-[#8C5238]/35 pl-5 py-1 mb-8">
+            <p class="text-sm font-serif italic text-[#1C1407]/70 leading-relaxed">
+                "Every product I reached for during my pregnancy came with a warning. My skin was changing every week — and the market had nothing made for me, for this phase, for this country."
+            </p>
+        </div>
+
+        <p class="text-[13px] leading-relaxed text-[#1C1407]/60 font-light mb-5">
+            India sees 26 million births each year. Yet not a single skincare brand has been formulated with the Indian mother in mind — her melanin-dense skin type, her tropical climate, her hormonal reality.
+        </p>
+        <p class="text-[13px] leading-relaxed text-[#1C1407]/60 font-light mb-10">
+            Maavie was born from that gap. We went back to Korean Hanbang botanical medicine and ancient Ayurvedic text, cross-validated every ingredient with modern clinical evidence. <span class="text-[#1C1407] font-medium">Ancient in origin. Rigorous in verification.</span>
+        </p>
+
+        <a href="#waitlist" class="link-u self-start text-[10px] uppercase tracking-[0.26em] font-semibold text-[#8C5238]">
+            Join Our Journey →
+        </a>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     STATS
+══════════════════════════════════════════ -->
+<section class="bg-[#FDFAF3] border-y border-[#8C5238]/10 py-14 px-6">
+    <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
+        <div class="reveal" style="transition-delay:0s">
+            <p class="num text-5xl md:text-6xl font-serif text-[#8C5238] font-light" data-from="0" data-to="26" data-suffix="M+">0</p>
+            <div class="w-6 h-px bg-[#8C5238]/25 mx-auto my-3"></div>
+            <span class="text-[10px] uppercase tracking-[0.2em] text-[#1C1407]/45 font-medium leading-tight block">Births in India annually</span>
+        </div>
+        <div class="reveal" style="transition-delay:.1s">
+            <p class="num text-5xl md:text-6xl font-serif text-[#8C5238] font-light" data-from="0" data-to="0" data-suffix="">0</p>
+            <div class="w-6 h-px bg-[#8C5238]/25 mx-auto my-3"></div>
+            <span class="text-[10px] uppercase tracking-[0.2em] text-[#1C1407]/45 font-medium leading-tight block">Maternity-safe Indian skin brands</span>
+        </div>
+        <div class="reveal" style="transition-delay:.2s">
+            <p class="num text-5xl md:text-6xl font-serif text-[#8C5238] font-light" data-from="0" data-to="2000" data-suffix="+">0</p>
+            <div class="w-6 h-px bg-[#8C5238]/25 mx-auto my-3"></div>
+            <span class="text-[10px] uppercase tracking-[0.2em] text-[#1C1407]/45 font-medium leading-tight block">Years of Hanbang science</span>
+        </div>
+        <div class="reveal" style="transition-delay:.3s">
+            <p class="num text-5xl md:text-6xl font-serif text-[#8C5238] font-light" data-from="0" data-to="100" data-suffix="%">0</p>
+            <div class="w-6 h-px bg-[#8C5238]/25 mx-auto my-3"></div>
+            <span class="text-[10px] uppercase tracking-[0.2em] text-[#1C1407]/45 font-medium leading-tight block">Maternity-safe formulations</span>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     INGREDIENTS — Editorial flat-lay cards
+══════════════════════════════════════════ -->
+<section id="ingredients" class="py-24 px-6 scroll-mt-20" style="background:#FAF0D8;">
+    <div class="max-w-6xl mx-auto">
+
+        <div class="text-center mb-16 reveal">
+            <span class="text-[10px] uppercase tracking-[0.34em] text-[#8C5238] font-semibold block mb-4">The Formulation Foundation</span>
+            <h2 class="font-serif font-light tracking-tight text-[#1C1407]"
+                style="font-size:clamp(2rem,4.5vw,3.5rem)">
+                Ancient ingredients.<br>
+                <span class="italic text-[#8C5238]">Exactly why they work.</span>
+            </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 reveal">
+
+            <!-- Tremella Mushroom -->
+            <div class="ing-card bg-[#FDFAF3] border border-[#8C5238]/12 rounded-2xl overflow-hidden card-lift">
+                <div class="overflow-hidden">
+                    <img class="ing-img"
+                         src="Maavie Website/Website%20Assets/Ingredients/ChatGPT%20Image%20Feb%207%2C%202026%2C%2008_50_41%20PM.png"
+                         alt="Tremella Mushroom & Ginseng">
+                </div>
+                <div class="p-7">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-6 h-6 rounded-full bg-[#8C5238]/10 text-[#8C5238] text-[10px] font-mono font-bold flex items-center justify-center shrink-0">01</span>
+                        <h3 class="text-sm font-serif font-semibold text-[#1C1407] tracking-wide uppercase">Tremella Mushroom</h3>
+                    </div>
+                    <p class="text-[12px] text-[#1C1407]/55 leading-relaxed font-light mb-4">
+                        Polysaccharides extracted through precision hot-water decoction. Holds moisture at a molecular level far superior to hyaluronic acid — specifically correcting pregnancy dehydration and postpartum skin texture breakdown.
+                    </p>
+                    <span class="text-[9px] uppercase tracking-[0.3em] text-[#8C5238] font-semibold">Deep Hydration Restoration</span>
+                </div>
+            </div>
+
+            <!-- Pear & Ginseng -->
+            <div class="ing-card bg-[#FDFAF3] border border-[#8C5238]/12 rounded-2xl overflow-hidden card-lift md:mt-7">
+                <div class="overflow-hidden">
+                    <img class="ing-img"
+                         src="Maavie Website/Website%20Assets/Ingredients/ChatGPT%20Image%20Feb%207%2C%202026%2C%2008_29_36%20PM.png"
+                         alt="Pear & Ginseng">
+                </div>
+                <div class="p-7">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-6 h-6 rounded-full bg-[#8C5238]/10 text-[#8C5238] text-[10px] font-mono font-bold flex items-center justify-center shrink-0">02</span>
+                        <h3 class="text-sm font-serif font-semibold text-[#1C1407] tracking-wide uppercase">Pear &amp; Ginseng</h3>
+                    </div>
+                    <p class="text-[12px] text-[#1C1407]/55 leading-relaxed font-light mb-4">
+                        Korean pear and red ginseng — a classical Hanbang pairing documented for thousands of years. Accelerates barrier cell regeneration, combats postpartum inflammation, and restores the skin matrix disrupted by hormonal surges.
+                    </p>
+                    <span class="text-[9px] uppercase tracking-[0.3em] text-[#8C5238] font-semibold">Barrier Repair &amp; Renewal</span>
+                </div>
+            </div>
+
+            <!-- Tremella closeup -->
+            <div class="ing-card bg-[#FDFAF3] border border-[#8C5238]/12 rounded-2xl overflow-hidden card-lift">
+                <div class="overflow-hidden">
+                    <img class="ing-img"
+                         src="Maavie Website/Website%20Assets/Ingredients/ChatGPT%20Image%20Feb%207%2C%202026%2C%2009_05_32%20PM.png"
+                         alt="Tremella & Ginseng closeup">
+                </div>
+                <div class="p-7">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-6 h-6 rounded-full bg-[#8C5238]/10 text-[#8C5238] text-[10px] font-mono font-bold flex items-center justify-center shrink-0">03</span>
+                        <h3 class="text-sm font-serif font-semibold text-[#1C1407] tracking-wide uppercase">Camellia Oil</h3>
+                    </div>
+                    <p class="text-[12px] text-[#1C1407]/55 leading-relaxed font-light mb-4">
+                        Premium cold-pressed extraction preserving omega-9 fatty acid integrity and antioxidant complex. Clinically verified safe across all pregnancy and nursing phases — sealing the barrier, restoring elasticity, and combating postpartum shedding.
+                    </p>
+                    <span class="text-[9px] uppercase tracking-[0.3em] text-[#8C5238] font-semibold">Barrier Sealing &amp; Elasticity</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PRODUCT — Full bleed wave art editorial
+══════════════════════════════════════════ -->
+<section class="relative flex items-center justify-center py-0 overflow-hidden clip-t clip-b min-h-[80vh]">
+
+    <!-- Background: wave art texture -->
+    <div class="absolute inset-0 bg-cover bg-center"
+         style="background-image: url('Maavie Website/Website%20Assets/Images/ChatGPT%20Image%20Mar%202%2C%202026%2C%2004_03_23%20PM.png');"></div>
+    <div class="absolute inset-0 bg-[#1A0F06]/78"></div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-6 py-28 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+        <!-- Product image -->
+        <div class="flex justify-center reveal-l">
+            <img src="Maavie Website/Website%20Assets/Images/ChatGPT%20Image%20Feb%2018%2C%202026%2C%2008_31_43%20PM.png"
+                 alt="Maavie serum"
+                 class="w-full max-w-md rounded-2xl object-cover"
+                 style="box-shadow:0 30px 80px rgba(196,150,42,0.25)">
+        </div>
+
+        <!-- Text -->
+        <div class="reveal-r">
+            <div class="flex items-center gap-4 mb-7">
+                <div class="w-8 h-px bg-[#C4962A]/60"></div>
+                <span class="text-[10px] uppercase tracking-[0.34em] text-[#C4962A] font-semibold">Opening Collection</span>
+            </div>
+            <h2 class="font-serif font-light text-[#FAF0D8] tracking-tight leading-tight mb-7"
+                style="font-size:clamp(2rem,4vw,3.25rem)">
+                Hanbang Hair<br>
+                <span class="italic" style="color:#C4962A;">Genesis Serum.</span>
+            </h2>
+            <p class="text-[13px] text-[#FAF0D8]/65 font-light leading-relaxed mb-6">
+                Precision-formulated with a core of Korean botanical actives — Tremella mushroom polysaccharides, Korean red ginseng, and cold-pressed Camellia oil — to address postpartum shedding, scalp barrier disruption, and hormonal hair loss at the root.
+            </p>
+            <p class="text-[13px] text-[#FAF0D8]/65 font-light leading-relaxed mb-10">
+                Dual-validated against traditional Hanbang pharmacopoeia and modern clinical safety standards. 100% safe through all phases of maternity.
+            </p>
+            <a href="#waitlist" class="inline-block bg-[#8C5238] text-[#FAF0D8] px-8 py-[13px] text-[10px] uppercase tracking-[0.26em] font-medium hover:bg-[#C4962A] transition-colors duration-300">
+                Secure Early Access
+            </a>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     WHY MAAVIE — Problem vs Standard
+══════════════════════════════════════════ -->
+<section id="why" class="bg-[#1A0F06] text-[#FAF0D8] py-24 px-6 scroll-mt-20">
+    <div class="max-w-6xl mx-auto">
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-14 mb-14 items-end">
+            <div class="lg:col-span-7 reveal">
+                <span class="text-[10px] uppercase tracking-[0.34em] text-[#8C5238] font-semibold block mb-5">The Problem</span>
+                <h2 class="font-serif font-light tracking-tight leading-tight"
+                    style="font-size:clamp(2.2rem,5vw,4rem)">
+                    The beauty industry<br>
+                    <span class="italic" style="color:#C4962A;">wasn't built for you.</span>
+                </h2>
+            </div>
+            <!-- Accent image -->
+            <div class="lg:col-span-5 reveal-r">
+                <div class="zoom-wrap rounded-2xl overflow-hidden">
+                    <img src="Maavie Website/Website%20Assets/Images/ChatGPT%20Image%20Feb%207%2C%202026%2C%2006_59_16%20PM.png"
+                         alt="Golden oil on hands"
+                         class="w-full h-52 object-cover">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden border border-[#FAF0D8]/8 reveal">
+
+            <!-- Left: Market -->
+            <div class="p-8 md:p-10 border-b md:border-b-0 md:border-r border-[#FAF0D8]/8">
+                <div class="flex items-center gap-3 mb-7">
+                    <div class="w-2 h-2 rounded-full bg-red-500/60 shrink-0"></div>
+                    <span class="text-[10px] uppercase tracking-[0.26em] text-[#FAF0D8]/35 font-medium">The Market Default</span>
+                </div>
+                <ul class="space-y-6">
+                    <li class="flex gap-4 items-start">
+                        <span class="text-red-400/70 shrink-0 mt-0.5 text-[13px]">✕</span>
+                        <div><p class="text-xs font-medium text-[#FAF0D8]/75 mb-1 tracking-wide">Retinoids &amp; AHAs</p>
+                        <p class="text-[11px] text-[#FAF0D8]/35 font-light leading-relaxed">Documented fetal development risk — widely sold without adequate warnings for pregnant women.</p></div>
+                    </li>
+                    <li class="flex gap-4 items-start">
+                        <span class="text-red-400/70 shrink-0 mt-0.5 text-[13px]">✕</span>
+                        <div><p class="text-xs font-medium text-[#FAF0D8]/75 mb-1 tracking-wide">Parabens &amp; Phthalates</p>
+                        <p class="text-[11px] text-[#FAF0D8]/35 font-light leading-relaxed">Endocrine and ovarian pathway disruption via systemic dermal absorption.</p></div>
+                    </li>
+                    <li class="flex gap-4 items-start">
+                        <span class="text-red-400/70 shrink-0 mt-0.5 text-[13px]">✕</span>
+                        <div><p class="text-xs font-medium text-[#FAF0D8]/75 mb-1 tracking-wide">Western Skin Calibration</p>
+                        <p class="text-[11px] text-[#FAF0D8]/35 font-light leading-relaxed">Formulas designed for fair, non-melanin-dense skin in temperate climates — irrelevant to India.</p></div>
+                    </li>
+                    <li class="flex gap-4 items-start">
+                        <span class="text-red-400/70 shrink-0 mt-0.5 text-[13px]">✕</span>
+                        <div><p class="text-xs font-medium text-[#FAF0D8]/75 mb-1 tracking-wide">Chemical Sunscreens</p>
+                        <p class="text-[11px] text-[#FAF0D8]/35 font-light leading-relaxed">Oxybenzone and octinoxate — estrogen-mimicking molecules absorbed systemically every day.</p></div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Right: Maavie -->
+            <div class="p-8 md:p-10 bg-[#8C5238]/12">
+                <div class="flex items-center gap-3 mb-7">
+                    <div class="w-2 h-2 rounded-full bg-[#C4962A] shrink-0"></div>
+                    <span class="text-[10px] uppercase tracking-[0.26em] text-[#C4962A] font-medium">The Maavie Standard</span>
+                </div>
+                <ul class="space-y-6">
+                    <li class="flex gap-4 items-start">
+                        <span class="text-[#C4962A] shrink-0 mt-0.5 text-[13px]">✓</span>
+                        <div><p class="text-xs font-medium text-[#FAF0D8]/80 mb-1 tracking-wide">Zero Unsafe Actives</p>
+                        <p class="text-[11px] text-[#FAF0D8]/45 font-light leading-relaxed">No retinoids, no salicylic acid above 2%. Every active holds a clean maternity safety record.</p></div>
+                    </li>
+                    <li class="flex gap-4 items-start">
+                        <span class="text-[#C4962A] shrink-0 mt-0.5 text-[13px]">✓</span>
+                        <div><p class="text-xs font-medium text-[#FAF0D8]/80 mb-1 tracking-wide">100% Phthalate &amp; Paraben Free</p>
+                        <p class="text-[11px] text-[#FAF0D8]/45 font-light leading-relaxed">Endocrine disruptors are entirely absent. Not trace amounts — completely eliminated.</p></div>
+                    </li>
+                    <li class="flex gap-4 items-start">
+                        <span class="text-[#C4962A] shrink-0 mt-0.5 text-[13px]">✓</span>
+                        <div><p class="text-xs font-medium text-[#FAF0D8]/80 mb-1 tracking-wide">India-First Architecture</p>
+                        <p class="text-[11px] text-[#FAF0D8]/45 font-light leading-relaxed">Engineered for melanin-rich skin exposed to tropical heat, humidity, and city pollution.</p></div>
+                    </li>
+                    <li class="flex gap-4 items-start">
+                        <span class="text-[#C4962A] shrink-0 mt-0.5 text-[13px]">✓</span>
+                        <div><p class="text-xs font-medium text-[#FAF0D8]/80 mb-1 tracking-wide">Dual-Validated Science</p>
+                        <p class="text-[11px] text-[#FAF0D8]/45 font-light leading-relaxed">Every ingredient verified twice — traditional Hanbang texts and modern independent lab testing.</p></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PROMISE
+══════════════════════════════════════════ -->
+<section id="promise" class="bg-[#FAF0D8] py-24 px-6 scroll-mt-20">
+    <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+        <div class="reveal-l">
+            <span class="text-[10px] uppercase tracking-[0.34em] text-[#8C5238] font-semibold block mb-5">Our Promise</span>
+            <h2 class="font-serif font-light tracking-tight leading-snug mb-6"
+                style="font-size:clamp(2rem,3.5vw,2.8rem)">
+                Every ingredient<br>
+                <span class="italic text-[#8C5238]">earns its place.</span>
+            </h2>
+            <p class="text-[13px] leading-relaxed text-[#1C1407]/60 font-light mb-5">
+                We operate a strict exclusion-first policy. If there is any ambiguity around safety during pregnancy, nursing, or fetal development — the ingredient is eliminated. No exceptions, no trace amounts, no grey zones.
+            </p>
+            <p class="text-[13px] leading-relaxed text-[#1C1407]/60 font-light mb-10">
+                What remains is a minimal, purposeful formulation — every element doing meaningful work, backed by both ancient empirical documentation and modern independent lab verification.
+            </p>
+
+            <!-- Actual logo in this section -->
+            <img src="Maavie Logos %26 Backgrounds/logo metallic maavie.png"
+                 alt="maavie" class="h-14 w-auto object-contain opacity-80">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 reveal-r">
+            <div class="bg-[#FDFAF3] border border-[#8C5238]/12 rounded-xl p-5 hover:shadow-md transition-shadow duration-300">
+                <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8C5238] mb-1.5">No Retinoids</p>
+                <span class="text-[10px] text-[#1C1407]/40 font-light">Fetal development risk</span>
+            </div>
+            <div class="bg-[#FDFAF3] border border-[#8C5238]/12 rounded-xl p-5 hover:shadow-md transition-shadow duration-300">
+                <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8C5238] mb-1.5">No Parabens</p>
+                <span class="text-[10px] text-[#1C1407]/40 font-light">Endocrine disruption</span>
+            </div>
+            <div class="bg-[#FDFAF3] border border-[#8C5238]/12 rounded-xl p-5 hover:shadow-md transition-shadow duration-300">
+                <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8C5238] mb-1.5">No Phthalates</p>
+                <span class="text-[10px] text-[#1C1407]/40 font-light">Ovarian pathway disruption</span>
+            </div>
+            <div class="bg-[#FDFAF3] border border-[#8C5238]/12 rounded-xl p-5 hover:shadow-md transition-shadow duration-300">
+                <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8C5238] mb-1.5">No Chemical SPF</p>
+                <span class="text-[10px] text-[#1C1407]/40 font-light">Estrogen-mimicking compounds</span>
+            </div>
+            <div class="bg-[#FDFAF3] border border-[#8C5238]/12 rounded-xl p-5 hover:shadow-md transition-shadow duration-300">
+                <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8C5238] mb-1.5">No Synthetic Fragrance</p>
+                <span class="text-[10px] text-[#1C1407]/40 font-light">Allergen toxicity vectors</span>
+            </div>
+            <div class="bg-[#FDFAF3] border border-[#8C5238]/12 rounded-xl p-5 hover:shadow-md transition-shadow duration-300">
+                <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8C5238] mb-1.5">Dual-Validated</p>
+                <span class="text-[10px] text-[#1C1407]/40 font-light">Traditional + clinical science</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     EDITORIAL QUOTE — Botanicals image
+══════════════════════════════════════════ -->
+<section class="relative flex items-center justify-center py-24 px-6 overflow-hidden min-h-[50vh]">
+    <div class="absolute inset-0 bg-cover bg-center"
+         style="background-image:url('Maavie Website/Website%20Assets/Images/ChatGPT%20Image%20Feb%207%2C%202026%2C%2007_43_12%20PM.png')"></div>
+    <div class="absolute inset-0 bg-[#FAF0D8]/88"></div>
+
+    <div class="relative z-10 text-center max-w-2xl mx-auto reveal">
+        <div class="flex items-center justify-center gap-4 mb-7">
+            <div class="w-10 h-px bg-[#8C5238]/50"></div>
+            <span class="text-[9px] uppercase tracking-[0.4em] text-[#8C5238] font-semibold">The Maavie Belief</span>
+            <div class="w-10 h-px bg-[#8C5238]/50"></div>
+        </div>
+        <blockquote class="font-serif italic text-[#1C1407] font-light leading-tight tracking-tight"
+                    style="font-size:clamp(1.7rem,4vw,2.9rem)">
+            "The body already possesses the architecture to adapt, heal, and change. We exist to support that intelligence."
+        </blockquote>
+        <p class="text-[10px] uppercase tracking-[0.32em] text-[#8C5238] mt-7 font-medium">Maavie Natural Sciences</p>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     WAITLIST — Mandala bg + dark overlay
+══════════════════════════════════════════ -->
+<section id="waitlist" class="relative py-28 px-6 scroll-mt-20 overflow-hidden">
+
+    <div class="absolute inset-0 bg-cover bg-center"
+         style="background-image:url('Maavie Logos %26 Backgrounds/maavie circle bg2.jpg')"></div>
+    <div class="absolute inset-0 bg-[#1A0F06]/88"></div>
+
+    <!-- Decorative rings -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[560px] h-[560px] rounded-full border border-[#C4962A]/10 pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-[#C4962A]/6 pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-lg mx-auto reveal">
+
+        <div class="text-center mb-10">
+            <img src="Maavie Logos %26 Backgrounds/Maavie Logo (Flatten).png"
+                 alt="maavie" class="h-16 w-auto object-contain mx-auto mb-8 opacity-90">
+            <div class="inline-flex items-center gap-3 mb-5">
+                <div class="w-8 h-px bg-[#C4962A]/50"></div>
+                <span class="text-[9px] uppercase tracking-[0.4em] text-[#C4962A] font-semibold">You're Early. That Matters.</span>
+                <div class="w-8 h-px bg-[#C4962A]/50"></div>
+            </div>
+            <h2 class="font-serif font-light text-[#FAF0D8] tracking-tight mb-4"
+                style="font-size:clamp(2rem,4vw,2.8rem)">
+                Be part of<br>
+                <span class="italic" style="color:#C4962A;">building Maavie.</span>
+            </h2>
+            <p class="text-[13px] text-[#FAF0D8]/75 leading-relaxed font-light max-w-sm mx-auto">
+                We're gathering insights directly from Indian mothers before our launch. Your voice shapes what we build for you.
+            </p>
+        </div>
+
+        <div id="form-container">
+            <form id="waitlist-form" onsubmit="handleSubmit(event)" class="space-y-3.5">
+                <div class="grid grid-cols-2 gap-3.5">
+                    <input type="text" id="uname" required placeholder="Your Name"
+                           class="w-full bg-white/10 border border-white/30 px-4 py-3.5 rounded-xl text-xs text-[#FAF0D8] placeholder-[#FAF0D8]/50 font-light focus:border-[#C4962A] focus:ring-1 focus:ring-[#C4962A] transition-all">
+                    <input type="email" id="uemail" required placeholder="Email Address"
+                           class="w-full bg-white/10 border border-white/30 px-4 py-3.5 rounded-xl text-xs text-[#FAF0D8] placeholder-[#FAF0D8]/50 font-light focus:border-[#C4962A] focus:ring-1 focus:ring-[#C4962A] transition-all">
+                </div>
+                <select id="ustage" class="sel w-full bg-white/10 border border-white/30 px-4 py-3.5 rounded-xl text-xs text-[#FAF0D8]/80 font-light focus:border-[#C4962A] focus:ring-1 focus:ring-[#C4962A] transition-all appearance-none">
+                    <option value="" style="background:#1C1407">Where are you in your journey? (Optional)</option>
+                    <option style="background:#1C1407">Currently pregnant</option>
+                    <option style="background:#1C1407">Postpartum (0–6 months)</option>
+                    <option style="background:#1C1407">Postpartum (6+ months)</option>
+                    <option style="background:#1C1407">Currently nursing</option>
+                    <option style="background:#1C1407">Planning to conceive</option>
+                    <option style="background:#1C1407">None of the above — just interested</option>
+                </select>
+                <textarea id="umsg" rows="2" placeholder="Skin or hair concerns you'd like us to address (Optional)"
+                          class="w-full bg-white/10 border border-white/30 px-4 py-3.5 rounded-xl text-xs text-[#FAF0D8] placeholder-[#FAF0D8]/50 font-light focus:border-[#C4962A] focus:ring-1 focus:ring-[#C4962A] transition-all resize-none"></textarea>
+                <button type="submit"
+                        class="w-full bg-[#8C5238] text-[#FAF0D8] py-4 rounded-xl text-[10px] font-semibold uppercase tracking-[0.26em] hover:bg-[#C4962A] transition-colors duration-300">
+                    Secure Priority Access
+                </button>
+                <p class="text-center text-[10px] text-[#FAF0D8]/45 tracking-wider font-light">
+                    No spam. Priority launch access &amp; clinical notes only.
+                </p>
+            </form>
+        </div>
+
+        <div id="success-msg" class="hidden text-center py-8">
+            <p class="font-serif italic mb-3" style="color:#C4962A; font-size:2rem">You're in.</p>
+            <p class="text-[13px] text-[#FAF0D8]/65 leading-relaxed font-light">
+                Welcome to the Maavie inner circle. You'll be among the first to receive our clinical ritual notes and priority launch access.
+            </p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer class="bg-[#FAF0D8] border-t border-[#8C5238]/10 py-14 px-6 text-center">
+    <img src="Maavie Logos %26 Backgrounds/logo metallic maavie.png"
+         alt="maavie" class="h-14 w-auto object-contain mx-auto mb-6 opacity-90">
+    <p class="text-[9px] uppercase tracking-[0.22em] text-[#1C1407]/35 mb-7">Where Life Begins</p>
+    <div class="flex flex-wrap justify-center gap-8 mb-8">
+        <a href="#story"       class="text-[10px] uppercase tracking-widest text-[#1C1407]/40 hover:text-[#8C5238] transition-colors duration-300 font-medium">Story</a>
+        <a href="#ingredients" class="text-[10px] uppercase tracking-widest text-[#1C1407]/40 hover:text-[#8C5238] transition-colors duration-300 font-medium">Science</a>
+        <a href="#why"         class="text-[10px] uppercase tracking-widest text-[#1C1407]/40 hover:text-[#8C5238] transition-colors duration-300 font-medium">Why Maavie</a>
+        <a href="#promise"     class="text-[10px] uppercase tracking-widest text-[#1C1407]/40 hover:text-[#8C5238] transition-colors duration-300 font-medium">Promise</a>
+        <a href="#waitlist"    class="text-[10px] uppercase tracking-widest text-[#1C1407]/40 hover:text-[#8C5238] transition-colors duration-300 font-medium">Waitlist</a>
+    </div>
+    <p class="text-[11px] text-[#1C1407]/30 font-light mb-2">&copy; 2026 Maavie Natural Sciences. All rights reserved.</p>
+    <p class="max-w-lg mx-auto text-[10px] leading-relaxed text-[#1C1407]/22 italic font-light">
+        For educational and informational purposes only. Does not constitute medical, dermatological, or clinical advice. Always consult a qualified healthcare provider during pregnancy and nursing.
+    </p>
+</footer>
+
+
+<script>
+    // ── Reveal on scroll ────────────────────────────────
+    const ro = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('up'); ro.unobserve(e.target); } });
+    }, { threshold:.1, rootMargin:'0px 0px -36px 0px' });
+    document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el => ro.observe(el));
+
+    // ── Stat counters ───────────────────────────────────
+    function animateCount(el) {
+        const to = parseInt(el.dataset.to, 10), suffix = el.dataset.suffix || '';
+        if (to === 0) { el.textContent = '0' + suffix; return; }
+        const dur = 1400, start = performance.now();
+        (function step(now) {
+            const p = Math.min((now - start) / dur, 1), e = 1 - Math.pow(1-p, 3);
+            el.textContent = Math.round(to * e).toLocaleString() + suffix;
+            if (p < 1) requestAnimationFrame(step);
+        })(start);
+    }
+    const co = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { animateCount(e.target); co.unobserve(e.target); } });
+    }, { threshold:.5 });
+    document.querySelectorAll('.num').forEach(el => co.observe(el));
+
+    // ── Hero parallax ───────────────────────────────────
+    const hm = document.getElementById('hero-media');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY < window.innerHeight) hm.style.transform = `translateY(${window.scrollY * 0.3}px)`;
+    }, { passive:true });
+
+    // ── Nav shadow ──────────────────────────────────────
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+        nav.style.boxShadow = window.scrollY > 20 ? '0 2px 30px rgba(140,82,56,.09)' : 'none';
+    }, { passive:true });
+
+    // ── Waitlist form ───────────────────────────────────
+    function handleSubmit(e) {
+        e.preventDefault();
+        if (document.getElementById('uname').value.trim() && document.getElementById('uemail').value.trim()) {
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('success-msg').classList.remove('hidden');
+        }
+    }
+</script>
+
+</body>
+</html>
