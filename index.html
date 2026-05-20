@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>maavie — Where Life Begins</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>emailjs.init('es8vk18zWk_XrLepE');</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
@@ -693,10 +695,30 @@
     // ── Waitlist form ───────────────────────────────────
     function handleSubmit(e) {
         e.preventDefault();
-        if (document.getElementById('uname').value.trim() && document.getElementById('uemail').value.trim()) {
-            document.getElementById('form-container').style.display = 'none';
-            document.getElementById('success-msg').classList.remove('hidden');
-        }
+
+        const btn  = e.target.querySelector('button[type="submit"]');
+        const orig = btn.textContent;
+        btn.disabled    = true;
+        btn.textContent = 'Sending…';
+
+        const params = {
+            from_name:    document.getElementById('uname').value.trim(),
+            from_email:   document.getElementById('uemail').value.trim(),
+            journey_stage: document.getElementById('ustage').value || 'Not specified',
+            message:      document.getElementById('umsg').value.trim() || 'No message provided',
+        };
+
+        emailjs.send('service_1ag02g9', 'template_t616ueg', params)
+            .then(() => {
+                document.getElementById('form-container').style.display = 'none';
+                document.getElementById('success-msg').classList.remove('hidden');
+            })
+            .catch((err) => {
+                console.error('EmailJS error:', err);
+                btn.disabled    = false;
+                btn.textContent = orig;
+                alert('Something went wrong. Please try again.');
+            });
     }
 </script>
 
